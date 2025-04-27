@@ -1,8 +1,9 @@
-import express from "express"
+import express from "express";
 import { createUser } from "../controllers/user.js";
+import { authenticateToken } from "../middlewares/firebase.js";
 
-const userRoute = express.Router()
+const userRoute = express.Router();
 
-userRoute.post("/", createUser)
+userRoute.post("/", authenticateToken, createUser);
 
 export default userRoute;

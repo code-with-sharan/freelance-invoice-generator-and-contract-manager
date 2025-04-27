@@ -6,9 +6,13 @@ const User = sequelize.define(
   "User",
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
+      autoIncrement:true,
       primaryKey: true,
-      autoIncrement: true,
+    },
+    firebaseUid: {
+      type: DataTypes.STRING,
+      unique: true,
     },
     userName: {
       type: DataTypes.STRING,
@@ -18,10 +22,10 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
+    // password: {
+    //   type: DataTypes.STRING,
+    //   allowNull: false,
+    // },
     role: {
       type: DataTypes.ENUM("FREELANCER", "CLIENT"),
       allowNull: true,
@@ -75,12 +79,11 @@ const User = sequelize.define(
 );
 
 User.hasMany(Invoice, {
-    foreignKey: "userId"
-})
+  foreignKey: "userId",
+});
 
 Invoice.belongsTo(User, {
-    foreignKey: "userId"
-})
+  foreignKey: "userId",
+});
 
 export default User;
-//
