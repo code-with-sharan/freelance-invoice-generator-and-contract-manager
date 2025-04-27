@@ -22,7 +22,6 @@ const Signup = () => {
       );
       // Signed in
       const user = userCredential.user;
-      console.log(user);
       const idToken = await user.getIdToken();
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/user`,
