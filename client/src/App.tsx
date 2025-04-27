@@ -12,10 +12,8 @@ function App() {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       setUser(user);
-      console.log("User is logged in:", user);
     } else {
       setUser(null);
-      console.log("User is NOT logged in");
     }
   });
 

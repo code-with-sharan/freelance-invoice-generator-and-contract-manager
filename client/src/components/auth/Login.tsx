@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc"; // Google icon from react-icons
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import auth from "../../firebase/firebase";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +10,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const googleProvider = new GoogleAuthProvider();// for google signin
 
   const onLoginHandler = async (e: any) => {
     e.preventDefault();
@@ -27,6 +28,16 @@ const Login = () => {
       });
   };
 
+  // google signin
+  const signInWithGoogle = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+      navigate("/home");
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
+    }
+  };
+
   return (
     <div className="h-screen flex items-center justify-center ">
       <div className="flex flex-col gap-4">
@@ -39,6 +50,7 @@ const Login = () => {
         <Button
           variant="outline"
           type="button"
+          onClick={signInWithGoogle}
           className="w-full cursor-pointer flex items-center justify-center gap-2"
         >
           <FcGoogle size={20} />

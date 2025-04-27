@@ -2,7 +2,11 @@ import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc"; // Google icon from react-icons
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import auth from "../../firebase/firebase";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -11,6 +15,29 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const googleProvider = new GoogleAuthProvider();
+
+  const apiCallForRegisteringUser = async (user: any) => {
+    const idToken = await user.getIdToken();
+    const response = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/api/user`,
+      {
+        email: user.email,
+        firebaseUid: user.uid,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+      }
+    );
+    if (response.data.success) {
+      console.log(response.data.message);
+      navigate("/home");
+    } else {
+      console.log(response.data.message);
+    }
+  };
 
   const onSubmitHandler = async (e: any) => {
     e.preventDefault();
@@ -21,31 +48,22 @@ const Signup = () => {
         password
       );
       // Signed in
-      const user = userCredential.user;
-      const idToken = await user.getIdToken();
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/user`,
-        {
-          email: user.email,
-          firebaseUid: user.uid,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${idToken}`, 
-          },
-        }
-      );
-      if (response.data.success) {
-        console.log(response.data.message);
-      } else {
-        console.log(response.data.message);
-      }
-
-      navigate("/login");
+      apiCallForRegisteringUser(userCredential.user);
     } catch (error: any) {
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log(errorCode, errorMessage);
+    }
+  };
+
+  // google signup
+  const signUpWithGoogle = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      apiCallForRegisteringUser(user);
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
     }
   };
 
@@ -61,6 +79,7 @@ const Signup = () => {
         <Button
           variant="outline"
           type="button"
+          onClick={signUpWithGoogle}
           className="w-full cursor-pointer flex items-center justify-center gap-2"
         >
           <FcGoogle size={20} />
